@@ -13,7 +13,7 @@ species.gbm <- function(x) {
   varTypes <- factor(apply(varInfo, 1, sum), levels = 0:2,
                      labels = c('Factor', 'Ordered', 'Numeric'))
   
-  nCat <- ifelse(varTypes != 'Factor', 1, sapply(x$var.levels, length))
+  nCat <- ifelse(varTypes == 'Numeric', 1, sapply(x$var.levels, length))
   
   return(structure(list(
     varTypes = varTypes,
@@ -40,6 +40,8 @@ timbr.gbm <- function(x, i, species=NULL) {
     if (splitVar[i] > 0) {
       if (varTypes[splitVar[i]] == 'Factor') {
         splitVal[i] <<- fromBinary(x$c.splits[[splitVal[i]+1]] == -1)
+      } else if (varTypes[splitVar[i]] == 'Ordered') {
+        splitVal[i] <<- splitVal[i] + 1
       }
     }
   })

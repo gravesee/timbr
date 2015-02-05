@@ -20,7 +20,6 @@ fromBinary <- function(v) {
 
 # combine functions
 combineFuncs <- function(f1, f2) {  
-  if (is.null(f1)) f1 <- function(x) TRUE
-  return(function(x) f1(x) & f2(x))
+  if (is.null(f1)) f2 else function(x) f1(x) & f2(x)
 }
 

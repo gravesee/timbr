@@ -43,12 +43,13 @@ getFuncText <- function(x, n, dir, species) {
 
       mask <- rep(0, species$nCat[var])
       mask[1:val] <- 1
-      mems <- paste(species$xLevels[[var]][mask], collapse="','")
-
+      mems <- paste(species$xLevels[[var]][which(mask == 1)], collapse="','")
+      print(mems)
     } else { # else a factor
 
-      eq   <- list(l="", r="!")
-      mems <- paste(species$xLevels[[var]][toBinary(val)], collapse="','")
+      eq  <- list(l="", r="!")
+      ids <- which(toBinary(val) == 1)
+      mems <- paste(species$xLevels[[var]][ids],collapse="','")
 
     }
     text <- sprintf("function(x) %s(x[, %s] %%in%% c('%s')) & !is.na(x[, %s])",
