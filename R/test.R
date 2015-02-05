@@ -131,8 +131,7 @@ timbr.gbm <- function(x, i, dendrology=NULL) {
   sapply(seq_along(splitVar), function(i) {
     if (splitVar[i] > 0) {
       if (varTypes[splitVar[i]] == 'Factor') {
-        splitVal[i] <<- sum(sapply(which(x$c.splits[[splitVal[i]+1]] == -1) - 1,
-                            function(x) 2^x))
+          splitVal[i] <<- fromBinary(x$c.splits[[splitVal[i]+1]] == -1)
       }
     }
   })
@@ -149,14 +148,30 @@ timbr.gbm <- function(x, i, dendrology=NULL) {
     class = 'timbr')
 }
 
+# function turning number to binar vector
+toBinary <- function(y) {
+  stopifnot(length(y) == 1, mode(y) == 'numeric')
+  q1  <- (y / 2) %/% 1
+  r   <- y - q1 * 2
+  res <- c(r)
+  while (q1 >= 1) {
+    q2 <- (q1 / 2) %/% 1
+    r  <- q1 - q2 * 2
+    q1 <- q2
+    res <- c(res, r)
+  }
+  res
+}
 
+# function turning vector of bits to number
+fromBinary <- function(v) {
+  sum(sapply(which(v == 1) - 1, function(x) 2^x))
+}
 
-
+# test mod trees
 for(x in 1:mod$n.trees) {
   tryCatch(timbr(mod, x), warning = function(w) print(x))
 }
-
-
 
 
 # sapply(which(intToBits(11) == 1) - 1, function(x) 2^x)
