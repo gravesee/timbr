@@ -13,10 +13,18 @@ species.gbm <- function(x) {
   varTypes <- factor(apply(varInfo, 1, sum), levels = 0:2,
                      labels = c('Factor', 'Ordered', 'Numeric'))
   
-  nCat <- ifelse(varTypes == 'Numeric', 1, sapply(x$var.levels, length))
+  nCat <- ifelse(varTypes == 'Numeric', 1, sapply(x$var.levels, length))  
+  
+  # names
+  varNames <- x$var.names
+  if (is.null(varNames)) VarNames <- paste0('v', seq_along(varTypes))
   
   return(structure(list(
+    family   = class(x),
+    nTrees   = x$n.trees,
+    varNames = varNames,
     varTypes = varTypes,
+    equality = list('<', '>='),
     xLevels  = x$var.levels,
     nCat     = nCat,
     missing  = TRUE,
@@ -54,6 +62,6 @@ timbr.gbm <- function(x, i, species=NULL) {
     splitVal   = splitVal,
     nodeStatus = ifelse(x$trees[[i]][[1]] == -1, -1, 0),
     nodePred   = x$trees[[i]][[8]]),
-    species = species,
-    class = 'timbr')
+    species    = species,
+    class      = 'timbr')
 }

@@ -22,72 +22,39 @@ print.timbr <- function(x, ...) {
   print(x, ...)
 }
 
-# make it so get func only needs the tree, dir, node and forest
-getFuncText <- function(x, n, dir, species) {
-  var <- x[n, 4]
-  val <- x[n, 5]  
-  
-  if (dir == 'm') {
-    text <- sprintf("function(x) is.na(x[, %s])", var)
-    return(text)
-  }
-  
-  if (species$varTypes[var] == 'Numeric') {
-    eq   <- list(l="<=", r=">")
-    text <- sprintf("function(x) x[, %s] %s %s & !is.na(x[, %s])",
-                    var, eq[[dir]], val, var)
-    
-  } else {
-    eq   <- list(l="", r="!")
-    if (species$varTypes[var] == 'Ordered') {
-
-      mask <- rep(0, species$nCat[var])
-      mask[1:val] <- 1
-      mems <- paste(species$xLevels[[var]][which(mask == 1)], collapse="','")
-      print(mems)
-    } else { # else a factor
-
-      eq  <- list(l="", r="!")
-      ids <- which(toBinary(val) == 1)
-      mems <- paste(species$xLevels[[var]][ids],collapse="','")
-
-    }
-    text <- sprintf("function(x) %s(x[, %s] %%in%% c('%s')) & !is.na(x[, %s])",
-                    eq[[dir]], var, mems, var)
-  }
-  return(text)
-}
-
 # function to unpack a timbr structure
 #' @export
-harvest <- function(x, i) {
+harvest <- function(x) {
   stopifnot(is.timbr(x))
   
-  l <- list() # store the functions in a list to be returned
+  nodes <- list() # store nodes in a list
   species <- attr(x, 'species')
   
-  recurse <- function(x, n = 1, fn=NULL) {    
+  # recurse on the timbr object passing the nodeID and the parent node
+  recurse <- function(x, n = 1, node = NULL) {
     
     if (x[n, 6] == -1) { # terminal node
-      l[[n]] <<- fn
-      return(fn)
+      nodes[[n]] <<- node
+      return(node)
     } else {
-      fl <- eval(parse(text = getFuncText(x, n, 'l', species)))
-      fr <- eval(parse(text = getFuncText(x, n, 'r', species)))
       
-      l[[x[n, 1]]] <<- recurse(x, n=x[n, 1], fn=combineFuncs(fn, fl))
-      l[[x[n, 2]]] <<- recurse(x, n=x[n, 2], fn=combineFuncs(fn, fr))
+      lNode <- node(x, x[n, 1], species, node)
+      rNode <- node(x, x[n, 2], species, node)      
+      
+      nodes[[x[n, 1]]] <<- recurse(x, n=x[n, 1], node = lNode)
+      nodes[[x[n, 2]]] <<- recurse(x, n=x[n, 2], node = rNode)
       
       if (species$missing) {
-        fm <- eval(parse(text = getFuncText(x, n, 'm', species)))
-        l[[x[n, 3]]] <<- recurse(x, n=x[n, 3], fn=combineFuncs(fn, fm))
+        mNode <- node(x, x[n, 3], species, node)
+        nodes[[x[n, 3]]] <<- recurse(x, n=x[n, 3], node = mNode)
       }      
-      return(fn)
+      return(node)
     }
   }
   recurse(x)
-  return(l)
+  return(lumber(nodes[-1]))
 }
+
 
 
 

@@ -14,8 +14,16 @@ species.randomForest <- function(x) {
   varTypes <- factor(apply(varInfo, 1, sum), levels = 0:2,
                      labels = c('Factor', 'Ordered', 'Numeric'))
   
+  # variable names
+  varNames <- names(x$forest$xlevels)
+  if (is.null(varNames)) varNames <- paste0('v', seq_along(varTypes))
+  
   return(structure(list(
+    family   = class(x),
+    nTrees   = x$ntree,
+    varNames = varNames,
     varTypes = varTypes,
+    equality = list('<=', '>'),
     xLevels  = x$forest$xlevels,
     nCat     = x$forest$ncat, # 1 for numeric/ordered else nlevels
     missing  = FALSE,

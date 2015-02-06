@@ -23,3 +23,8 @@ combineFuncs <- function(f1, f2) {
   if (is.null(f1)) f2 else function(x) f1(x) & f2(x)
 }
 
+# returns a length 2 vector of [parentID, dir]
+# 1 - Left, 2 - Right, 3 - Missing
+findLineage <- function(x, n) {
+  which(x[,1:3] == n, arr.ind = TRUE)
+}
