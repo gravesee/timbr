@@ -1,5 +1,3 @@
-# class that takes the processed timbr and exposes it
-
 
 # object that creates a store of processed timbr from a tree algorithm object
 #' @export
@@ -37,6 +35,41 @@ subsetLumberYard <- function(ly, i) {
     termNodes = which(vapply(x, '[[', numeric(1), 'nodeStatus') == -1),
     class = 'lumber')
 }
+
+printNodeText <- function(ly, i=NULL, newdata=NULL, y=NULL) {
+  if (is.null(i)) i <- seq_along(ly) # print all nodetext
+  
+  # get position in ensemble based on node id
+  idx <- attr(ly, 'index')
+  
+  for (x in seq_along(i)) {
+    tree <- idx[i[x], 1]
+    node <- idx[i[x], 2]
+    id <- sprintf('\nTree: %4s, Node: %3s, NodeID: %5s', tree, node, i[x])
+    nt <- getLumberAttribute(ly, tree, node, 'nodeText')
+    
+    cat(paste0(id, nt, '\n'))
+    
+    if (!is.null(newdata) & !is.null(y)) {
+      FUN <- getLumberAttribute(ly, tree, node, 'FUN')
+      
+      tbl <- aggregate(y, list(FUN(newdata)), function(x) {
+        c(totN=format(length(x), digits=0),
+          sumY=format(sum(x, na.rm=T), digits=0),
+          meanY=format(mean(x, na.rm=T), digits=3))
+      })
+      tbl <- data.frame(tbl$Group.1, tbl$x)
+      colnames(tbl) <- c("Condition", "totN", "sumY", "meanY")
+      cat('\nPerformance:\n')
+      print(tbl)
+    }
+  }
+}
+
+getLumberAttribute <- function(ly, tree, node, attr) {  
+  ly[[tree]][[node]][[attr]]
+}
+
 
 # x is a list of nodes
 lumber <- function(x) {

@@ -17,7 +17,7 @@ species.gbm <- function(x) {
   
   # names
   varNames <- x$var.names
-  if (is.null(varNames)) VarNames <- paste0('v', seq_along(varTypes))
+  if (is.null(varNames)) varNames <- paste0('v', seq_along(varTypes))
   
   return(structure(list(
     family   = class(x),
