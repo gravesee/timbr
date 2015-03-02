@@ -1,7 +1,6 @@
 # timbr interface to randomForest
 
 # function that describes the forest
-#' @export
 species.randomForest <- function(x) {
   # TODO: should also check that only two levels are present for classification
   
@@ -32,7 +31,6 @@ species.randomForest <- function(x) {
 }
 
 # map random forest tree to timbr tree
-#' @export
 timbr.randomForest <- function(x, i, species=NULL) {
   if (is.null(species)) species <- species(x)
   

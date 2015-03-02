@@ -3,38 +3,34 @@
 \alias{timbr}
 \docType{package}
 \title{
-What the package does (short line)
-~~ package title ~~
+Unified interface to R's decistion tree models (short line)
 }
 \description{
-More about what it does (maybe more than one line)
-~~ A concise (1-5 lines) description of the package ~~
+timbr provides a unified interface to R's many decision tree models. Functions
+written to operate on this interface can be used interchangeably regardless of
+the underlying decision tree algorithm. A function extracting the nodes of a
+random forest can be used on a gradient boosted model without writing code
+customized to either model.
 }
 \details{
 \tabular{ll}{
 Package: \tab timbr\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
+Version: \tab 0.5\cr
 Date: \tab 2015-02-04\cr
-License: \tab What license is it under?\cr
+License: \tab Proprietary\cr
 }
 ~~ An overview of how to use the package, including the most important functions ~~
+TODO
 }
 \author{
-Who wrote it
+Eric E. Graves
 
-Maintainer: Who to complain to <yourfault@somewhere.net>
-~~ The author and/or maintainer of the package ~~
-}
-\references{
-~~ Literature or other references for background information ~~
-}
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation directory ~~
-\keyword{ package }
-\seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
+Maintainer: Eric E. Graves <gravcon5@gmail.com>
 }
 \examples{
-~~ simple examples of the most important functions ~~
+library(randomForest)
+rf <- randomForest(mtcars[-1], mtcars[1])
+ly <- lumbarYard(rf)
+predict(ly, mtcars[-1])
 }

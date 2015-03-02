@@ -1,4 +1,4 @@
-# function turning number to binar vector
+# function turning number to 'binary' vector
 toBinary <- function(y) {
   stopifnot(length(y) == 1, mode(y) == 'numeric')
   q1  <- (y / 2) %/% 1
@@ -28,3 +28,37 @@ combineFuncs <- function(f1, f2) {
 findLineage <- function(x, n) {
   which(x[,1:3] == n, arr.ind = TRUE)
 }
+
+#' Impute missing values 
+#' 
+#' Naive impuation using mode for factors and median for numerics. The function
+#' returns a modified \code{data.frame} where missing values have been replaced
+#' with modes for factors and medians for numerics. The returned object has the
+#' imputed values added as the attribute "imputed".
+#' 
+#' @param x a data.frame object
+#' @return a \code{data.frame} object with an appended \code{imputed} class and
+#' attribute.
+#' @export imputeMissing
+imputeMissing <- function(x) {
+  impute.values <- list()
+  
+  impute <- function(x) {
+    # impute the mode
+    if (class(x) == 'factor') {
+      val <- levels(x)[which.max(tabulate(x))]
+    } else {
+      val <- median(x, na.rm=T)
+    }
+    x[is.na(x)] <- val
+    impute.values[[length(impute.values) + 1]] <<- val
+    x
+  }
+  
+  df <- data.frame(lapply(x, impute))
+  names(impute.values) <- colnames(df)
+  structure(df, imputed = impute.values, class = c('data.frame', 'imputed'))
+}
+
+#(TODO) calculate deviance for uncorrelated scoring...
+

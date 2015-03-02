@@ -1,6 +1,4 @@
-# timbr interface to randomForest
-
-#' @export
+# timbr interface to GBM
 species.gbm <- function(x) {
   # bind necessary elements into a matrix
   varInfo <- cbind(
@@ -33,7 +31,6 @@ species.gbm <- function(x) {
 }
 
 # map gbm forest tree to timbr tree
-#' @export
 timbr.gbm <- function(x, i, species=NULL) {
   if (is.null(species)) species <- species(x)
   
