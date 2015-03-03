@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Using Timbr</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: #990073
+   }
+
+   pre .number {
+     color: #099;
+   }
+
+   pre .comment {
+     color: #998;
+     font-style: italic
+   }
+
+   pre .keyword {
+     color: #900;
+     font-weight: bold
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: #d14;
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+<!-- MathJax scripts -->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h2>Using Timbr</h2>
+
+<p><code>timbr</code> is a new R package that makes it easy to extract useful information from
+R&#39;s popular decision tree objects. With <code>timbr</code> we can create thousands of new
+interaction variables in a short time. With a quick post-processing step, we 
+can run all of these interaction variables, or rules, through <code>LASSO</code> regression
+to quickly identify potential predictors to add to our models.</p>
+
+<h2>Data Preparation</h2>
+
+<p>Throughout this tutorial, we will be using the familar titanic dataset that
+comes installed with <code>mjollnir</code>. Before we begin, we must do a little house-
+keeping to set up our workspace with the libraries we need and set the seed for
+our random number generation.</p>
+
+<pre><code class="r">library(timbr)
+library(mjollnir)
+data(titanic)
+set.seed(123) # set the seed for reproducible results!
+
+# let&#39;s sample the data first by taking a random 50% of records
+dev &lt;- sample(nrow(titanic), nrow(titanic) / 2)
+</code></pre>
+
+<h2>Baseline Model</h2>
+
+<p>We are first going to make a simple logistic regression model and see how
+<code>timbr</code> can be used to find new interactions worth exploring. The following code
+fits a model in the same way as SAS&#39;s <code>proc glm</code>. The syntax  for R is a bit
+more concise.</p>
+
+<pre><code class="r"># a simple logistic regression model
+lm &lt;- glm(Survived ~ Fare + Sex, data=titanic[dev,], family=&#39;binomial&#39;)
+print(lm)
+</code></pre>
+
+<pre><code>## 
+## Call:  glm(formula = Survived ~ Fare + Sex, family = &quot;binomial&quot;, data = titanic[dev, 
+##     ])
+## 
+## Coefficients:
+## (Intercept)         Fare      Sexmale  
+##     0.56693      0.01708     -2.53983  
+## 
+## Degrees of Freedom: 444 Total (i.e. Null);  442 Residual
+## Null Deviance:       587.9 
+## Residual Deviance: 414.3     AIC: 420.3
+</code></pre>
+
+<pre><code class="r"># predict the model on the validation data
+phat &lt;- predict(lm, titanic[-dev,])
+
+# print the ks value
+ks.table(phat, titanic$Survived[-dev], n.bins = 10)$ks
+</code></pre>
+
+<pre><code>## [1] 0.5010943
+</code></pre>
+
+<p>We now have a fully working logistic regression model with two terms. Pretending
+for a moment that this model was built in <code>Xeno</code>, we would call our model
+finished. </p>
+
+<p>But what about insights we might not think of? <code>timbr</code> provieds a fast, cheap
+method for generating simple interaction rules that are predictive and may
+provide additional lift when added to a model.</p>
+
+<p>The concept of <code>timbr</code> is to wrap a decision tree object into a simple,
+easy-to-use object called a <code>lumberYard</code>. The <code>lumberYard</code> allows you to extract
+all sorts of useful tidbits from the underlying decision tree model.</p>
+
+<h2>Generating rules using a Random Forest</h2>
+
+<p>We are going to build a <code>randomForest</code> and use <code>timbr</code> to create a <code>lumberYard</code>
+out of it. We will use this <code>lumberYard</code> to create thousands of indivual rules
+which correspond to the nodes of the decision trees.</p>
+
+<p>A <code>randomForest</code> is an <em>ensemble</em> technique that builds hundreds of decision
+trees and averages them together in some manner. Unlike <code>gbm</code> which creates its
+decision trees by adding the best available variable at each split,
+<code>randomForest</code> <em>randomly samples</em> predictors at every split and <em>then</em> picks the 
+best one. The advantage of this approach is that it introduces variable
+combinations that would not otherwise be discovered.</p>
+
+<p>Let&#39;s attempt to build a quick <code>randomForest</code> with the following code.</p>
+
+<pre><code class="r">library(randomForest)
+rf &lt;- randomForest(x = titanic[dev,-1], y = factor(titanic$Survived[dev]),
+                   maxnodes = 8, ntree = 100)
+</code></pre>
+
+<pre><code>## Error in randomForest.default(x = titanic[dev, -1], y = factor(titanic$Survived[dev]), : NA not permitted in predictors
+</code></pre>
+
+<p>What happened? This generates an error because <code>randomForest</code> does not allow
+missing values. We must impute them using a utility function included in <code>timbr</code></p>
+
+<pre><code class="r">df &lt;- imputeMissing(titanic)
+rf &lt;- randomForest(x = df[dev,-1], y = factor(df$Survived[dev]), maxnodes = 8,
+                   ntree = 100)
+</code></pre>
+
+<p>Note that the <code>y</code> variable is surrounded by the <code>factor</code> function. In order to 
+use <code>randomForest</code> for classification instead of regression, the dependent
+variable must be a <code>factor</code>.</p>
+
+<h2>Creating a lumberYard</h2>
+
+<p>Creating a <code>lumberYard</code> from a <code>randomForest</code> object is easy, though it can take
+a while if your ensemble has a great many trees and nodes. Simply wrap your
+<code>gbm</code> or <code>randomForest</code> object in the <code>lumberYard</code> function.</p>
+
+<pre><code class="r">ly &lt;- lumberYard(rf)
+</code></pre>
+
+<p>The insides of a <code>lumberYard</code> are neatly hidden away and don&#39;t ever need to be
+accessed for routine use. But in general, it is a massive collection of <code>nodes</code>
+that have been translated from the underlying tree models. We can inspect the 
+<code>nodes</code> with <code>printNodes</code> and a vector of node IDs.</p>
+
+<pre><code class="r">printNodes(ly, 1) # first split left
+</code></pre>
+
+<pre><code>## NodeID:     1
+## ------------------
+## Embarked in c(&#39;&#39;,&#39;C&#39;)
+</code></pre>
+
+<pre><code class="r">printNodes(ly, 2) # first split right
+</code></pre>
+
+<pre><code>## NodeID:     2
+## ------------------
+## Embarked in c(&#39;Q&#39;,&#39;S&#39;)
+</code></pre>
+
+<pre><code class="r">printNodes(ly, 3) # child of first split
+</code></pre>
+
+<pre><code>## NodeID:     3
+## ------------------
+## Embarked in c(&#39;&#39;,&#39;C&#39;)
+## Fare &lt;= 30.1
+</code></pre>
+
+<pre><code class="r">printNodes(ly, c(1, 5, 10)) # multiple nodes
+</code></pre>
+
+<pre><code>## NodeID:     1
+## ------------------
+## Embarked in c(&#39;&#39;,&#39;C&#39;) 
+## 
+## NodeID:     5
+## ------------------
+## Embarked in c(&#39;Q&#39;,&#39;S&#39;)
+## SibSp &lt;= 1.5 
+## 
+## NodeID:    10
+## ------------------
+## Embarked in c(&#39;&#39;,&#39;C&#39;)
+## Fare &gt; 30.1
+## Pclass in c(&#39;2&#39;,&#39;3&#39;)
+</code></pre>
+
+<p><code>printNodes</code> takes some optional data arguments for reporting performance as
+well. We will explore that usage later in the tutorial.</p>
+
+<p>More importantly, we can <em>predict</em> nodes which is what we will use to find
+new and interesting rules. Why not just use all of them? Because there are far
+too many nodes to use an exhaustive search. However, by using <code>LASSO</code>
+regression, we can focus on the most important predictors.</p>
+
+<h2>Generating the nodes</h2>
+
+<pre><code class="r"># predictions from lumberyard
+nodes &lt;- predict(ly, df[dev,-1], type = &#39;All&#39;)
+dim(nodes)
+</code></pre>
+
+<pre><code>## [1]  445 1400
+</code></pre>
+
+<pre><code class="r">head(nodes[1:5,1:5]) # sample of what matrix looks like
+</code></pre>
+
+<pre><code>##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    1    0    0    1    0
+## [2,]    0    1    0    0    1
+## [3,]    0    1    0    0    1
+## [4,]    0    1    0    0    1
+## [5,]    0    1    0    0    1
+</code></pre>
+
+<p>Becuase we specified a <code>maxnodes</code> of 8 when we created the <code>randomForest</code> we
+created 14 nodes per tree. <code>maxnodes</code> specifies the number of <em>terminal</em> nodes.
+Every pair of nodes has one parent so the total nodes possible in a tree is with
+a <code>maxnodes</code> value of 8 is:</p>
+
+<p>\[8 + 4 + 2 = 14\]</p>
+
+<p>Our initial forest created 100 trees each with 14 nodes for a total of 1,400
+generated rules! How are we going to separate the chaff from the wheat? With
+<code>LASSO</code> regression.</p>
+
+<h2>Massaging our nodes</h2>
+
+<p>Recall that <code>LASSO</code> regression is exactly the same as logistic regression with
+one important addition. A slight tweak to the fitting algorithm is made such 
+that unimportant or redundant variables are shrunk away to zero. What we are
+left with is a very sparse model. In our case, we will be left with the most
+important &ldquo;rules&rdquo; in our dataset.</p>
+
+<p>Before we begin, though, we have to massage our nodes just a bit. <code>randomForest</code>
+does not support a minumum observations in terminal nodes option like <code>gbm</code> so
+we have to make sure our nodes don&#39;t have counts that are too small for our
+comfort.</p>
+
+<pre><code class="r"># create a vector of the node counts
+cnts &lt;- apply(nodes, 2, function(x) min(sum(x == 0), sum(x == 1)))
+summary(cnts)
+</code></pre>
+
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    1.00   23.75   58.00   77.29  132.20  222.00
+</code></pre>
+
+<p>Roughly a quarter of our nodes have fewer than 25 observations in the terminal
+node. This is a little too many for my comfort so I am going to zero out the 
+nodes by using a convenience function from <code>timbr</code>.</p>
+
+<pre><code class="r">nodes &lt;- dropSmallNodes(nodes, 25)
+cnts &lt;- apply(nodes, 2, sum)
+summary(cnts[cnts &gt; 0])
+</code></pre>
+
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    25.0    48.0    88.0   126.9   190.0   420.0
+</code></pre>
+
+<p>We now have a nodes matrix where nodes are either ALL zero, or have a minimum
+of 25 observations. We are ready to find out which ones are the most predictive.</p>
+
+<h2>Finding predictive rules</h2>
+
+<p>Creating a LASSO regression is easy with our nodes matrix and a target variable.
+We just need to remember to load the library and pass in the appropriate 
+arguments to the function.</p>
+
+<pre><code class="r">library(glmnet)
+
+fit &lt;- cv.glmnet(x = nodes, y = df$Survived[dev], alpha = 1,
+                 family = &#39;binomial&#39;, nfolds = 5)
+plot(fit)
+</code></pre>
+
+<p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-10"/> </p>
+
+<p>We just trained a LASSO regression model on our dataset five times. The plot
+shows our cross-validated error as a function of the number of predcitors in our
+model. Remember, we started with 1,400 predictors and the plot shows that only 
+using 27 produces the best cross-validated model!</p>
+
+<pre><code class="r"># get a list of the best predictors
+betas &lt;- coef(fit, s = &#39;lambda.min&#39;)[-1]
+best &lt;- which(betas != 0) # gives us the nodes that aren&#39;t zeroed out!
+best
+</code></pre>
+
+<pre><code>##  [1]    6   53  174  188  315  343  355  363  389  401  420  511  537  571
+## [15]  667  820  869  870  915 1043 1045 1048 1089 1189 1384
+</code></pre>
+
+<pre><code class="r"># sort by absolute value of the coefficient ** not necessary **
+best &lt;- best[order(-abs(betas[best]))]
+</code></pre>
+
+<p>To find out which nodes are the most predictive, we need to work with the <code>coef</code>
+function from the <code>glmnet</code> library. By passing in &#39;lambda.min&#39; we are asking for
+the coefficients that give us the best performing model on the cross-validation.</p>
+
+<h2>Printing out the best rules</h2>
+
+<p>Now that we know <em>which</em> rules are the most predictive. Let&#39;s see what they look
+like.</p>
+
+<pre><code class="r"># print just the node text for nodes 1 and 3
+printNodes(ly, best[c(1,3)])
+</code></pre>
+
+<pre><code>## NodeID:  1384
+## ------------------
+## SibSp &lt;= 2.5
+## Parch &lt;= 0.5
+## Fare &gt; 52.2771
+## Pclass in c(&#39;1&#39;,&#39;3&#39;) 
+## 
+## NodeID:  1189
+## ------------------
+## Sex in c(&#39;female&#39;)
+## Embarked in c(&#39;&#39;,&#39;C&#39;,&#39;Q&#39;)
+## Parch &lt;= 1.5
+## Age &lt;= 29
+</code></pre>
+
+<p>By passing a dataset and response variable into the <code>printNodes</code> function we can
+also generate performance statistics for the node.</p>
+
+<pre><code class="r"># let&#39;s see how the sixteenth node performs
+printNodes(ly, best[16], df[dev,-1], df$Survived[dev])
+</code></pre>
+
+<pre><code>## NodeID:    53
+## ------------------
+## Sex in c(&#39;male&#39;)
+## Age &gt; 1.5
+## Fare &lt;= 52.2771 
+## 
+## Performance:
+##    node y.totN y.sumY y.meanY
+## 1 FALSE    183    130    0.71
+## 2  TRUE    262     36   0.137
+</code></pre>
+
+<p>Based on the results for this node, if you were potty-trained male with a cheap
+ticket, you didn&#39;t fare too well during the sinking of the Titanic.</p>
+
+<pre><code class="r"># And by contrast, the second node
+printNodes(ly, best[2], df[dev,-1], df$Survived[dev])
+</code></pre>
+
+<pre><code>## NodeID:   389
+## ------------------
+## Sex in c(&#39;female&#39;)
+## SibSp &lt;= 5
+## Pclass in c(&#39;1&#39;,&#39;2&#39;)
+## Age &lt;= 56.5 
+## 
+## Performance:
+##    node y.totN y.sumY y.meanY
+## 1 FALSE    365     89   0.244
+## 2  TRUE     80     77   0.963
+</code></pre>
+
+<p>Young or married females in first and second class with family members aboard
+were likely to make it off the ship alive. Women and children first indeed!</p>
+
+<h2>Now what?</h2>
+
+<p>Once we find out the nodeIDs of our most predictive nodes we would like to do
+something with them. Typically this will involve bringing them into another
+model to see if they provide lift. You can easily write them to csv with the
+follwing notation.</p>
+
+<pre><code class="r">bestNodes &lt;- data.frame(predict(ly, df[-1], i = best, type = &#39;Nodes&#39;))
+colnames(bestNodes) &lt;- paste(&#39;Node&#39;, best, sep=&#39;_&#39;)
+</code></pre>
+
+<p>And write it to disk</p>
+
+<pre><code class="r">write.csv(bestNodes, file = &quot;Path/To/My/File.csv&quot;)
+</code></pre>
+
+<p>It is then very easy to bring these new features into Xeno to assess whether 
+they provide value or not. It is not very helpful to see a bunch of generically
+named flag variables; however, so we should also print out the node text for
+reference. This is also straightforward by enclosing the <code>printNodes</code> function
+in a <code>sink</code> sandwich.</p>
+
+<pre><code class="r">sink(&quot;Path/To/My/NodeReference.txt&quot;)
+printNodes(ly, best)
+sink()
+</code></pre>
+
+<h2>What about that baseline model</h2>
+
+<p>We can do more than just output new fields into Xeno, though. Let&#39;s see if any
+of our flags want to come into our logistic regression model. Let&#39;s add just the
+top two nodes to our dataset and see how the logistic model performs.</p>
+
+<p>First we will add our best-performing nodes to the original titanic dataset.</p>
+
+<pre><code class="r"># add our best nodes to the titanic dataset
+df2 &lt;- cbind(titanic, bestNodes)
+</code></pre>
+
+<p>Next, we will grow a logistic regression model starting with just an intercept.
+We will apply forward stepwise regression to build a logistic model just like
+we would in SAS.</p>
+
+<p>In R we grow a model by telling the <code>step</code> function what the initial model looks
+like and what the <em>saturated</em> model looks like. In this case, the initial model
+is simply an intercept. The saturated model contains all of the variables in
+our original titanic dataset.</p>
+
+<pre><code class="r"># create an intercept only model
+int.only &lt;- glm(Survived~1, df2, family = &#39;binomial&#39;)
+
+# forward stepwise regression to build a base logistic regression model
+base &lt;- step(int.only, Survived ~ Fare+Sex+Pclass+SibSp+Parch,
+             direction=&quot;forward&quot;)
+</code></pre>
+
+<p>We can then use our final base model as the <em>initial</em> model in another stepwise
+regression. This time, the saturated model will contain all of our best nodes
+as well.</p>
+
+<pre><code class="r"># create a new model formula adding the nodes
+add &lt;- formula(paste0(&quot;~ . +&quot;, paste(colnames(bestNodes), collapse = &quot; + &quot;)))
+
+# the update function takes an existing formula and modifies it
+f2 &lt;- update(formula(base), add)
+
+# forward stepwise regression adding nodes to the base logistic model
+full &lt;- step(base, f2, direction=&quot;forward&quot;)
+</code></pre>
+
+<p>We now have two logistic regression models. One built using main effects only
+which simulates the Xeno modeling process and one consisting of the same model
+with the added possibility of using additional interaction nodes.</p>
+
+<p>We can compare the results of each model and plot their ROC curves.</p>
+
+<pre><code class="r"># score the base model and the model w/Nodes on the VALIDATION data sets
+phat.original &lt;- predict(base, titanic[-dev,])
+phat.wNodes &lt;- predict(full, df2[-dev,])
+
+# ks of original
+ks.table(phat.original, titanic$Survived[-dev])$ks
+</code></pre>
+
+<pre><code>## [1] 0.5553872
+</code></pre>
+
+<pre><code class="r"># ks with Nodes
+ks.table(phat.wNodes, titanic$Survived[-dev])$ks
+</code></pre>
+
+<pre><code>## [1] 0.6594276
+</code></pre>
+
+<p>Plotting the ROC curves we see the interaction nodes did indeed add 
+considerable lift to the model (red curve).</p>
+
+<p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-22"/> </p>
+
+</body>
+
+</html>
