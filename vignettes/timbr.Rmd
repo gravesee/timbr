@@ -76,7 +76,7 @@ combinations that would not otherwise be discovered.
 
 Let's attempt to build a quick `randomForest` with the following code.
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, error=TRUE}
 library(randomForest)
 rf <- randomForest(x = titanic[dev,-1], y = factor(titanic$Survived[dev]),
                    maxnodes = 8, ntree = 100)
