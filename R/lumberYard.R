@@ -114,7 +114,8 @@ getNode <- function(x, nodeID) {
 #' @export printNodes
 printNodes <- function(x, nodes, newdata=NULL, y=NULL) {
   for (nodeID in nodes) {
+    cat(sprintf("NodeID: %5s\n------------------", nodeID))
     print(getNode(x, nodeID), newdata, y)
     cat('\n')
-  }  
+  }
 }

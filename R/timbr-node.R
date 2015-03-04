@@ -114,10 +114,7 @@ node.print.func <- function(x) {
 #' @details if \code{newdata} and \code{y} are passed into the function as well,
 #' a table of summarized performance will be printed after the node text.
 print.node <- function(node, newdata=NULL, y=NULL) {
-  cat(sprintf('NodeID: %5s\n%s%s',
-              node$nodeID,
-              paste(rep('-', 20), collapse=''),
-              node$nodeText), '\n')
+  cat(node$nodeText, '\n')
   
   # if newdata and y are passed, print stats
   if (!is.null(newdata) & !is.null(y)) {    
