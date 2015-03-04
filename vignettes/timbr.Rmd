@@ -57,13 +57,9 @@ We now have a fully working logistic regression model with two terms. Pretending
 for a moment that this model was built in `Xeno`, we would call our model
 finished. 
 
-But what about insights we might not think of? `timbr` provieds a fast, cheap
+But what about insights we might not think of? `timbr` provides a fast, cheap
 method for generating simple interaction rules that are predictive and may
 provide additional lift when added to a model.
-
-The concept of `timbr` is to wrap a decision tree object into a simple,
-easy-to-use object called a `lumberYard`. The `lumberYard` allows you to extract
-all sorts of useful tidbits from the underlying decision tree model.
 
 ## Generating rules using a Random Forest
 
@@ -101,9 +97,13 @@ variable must be a `factor`.
 
 ## Creating a lumberYard
 
+The concept of `timbr` is to wrap a decision tree model within a simple,
+easy-to-use object called a `lumberYard`. The `lumberYard` allows you to extract
+all sorts of useful tidbits from the underlying decision tree model.
+
 Creating a `lumberYard` from a `randomForest` object is easy, though it can take
 a while if your ensemble has a great many trees and nodes. Simply wrap your
-`gbm` or `randomForest` object in the `lumberYard` function.
+`randomForest` object in the `lumberYard` function.
 
 ```{r, echo=TRUE}
 ly <- lumberYard(rf)
@@ -114,11 +114,24 @@ accessed for routine use. But in general, it is a massive collection of `nodes`
 that have been translated from the underlying tree models. We can inspect the 
 `nodes` with `printNodes` and a vector of node IDs.
 
-```{r, echo=TRUE}
-printNodes(ly, 1) # first split left
-printNodes(ly, 2) # first split right
-printNodes(ly, 3) # child of first split
-printNodes(ly, c(1, 5, 10)) # multiple nodes
+Below is a printout of the first node and its first child. Notice that the child
+node contains the text of the parent node. This is logically consistent with how
+decision trees are created.
+
+```{r, echo=TRUE, collapse=TRUE}
+# first split
+printNodes(ly, 1)
+
+# child of first split
+printNodes(ly, 3)
+```
+
+We can also pass a vector of node IDs to `printNodes` and it will print out each
+one in sequence.
+
+```{r, echo=TRUE, collapse=TRUE}
+# multiple nodes
+printNodes(ly, c(4, 7))
 ```
 
 `printNodes` takes some optional data arguments for reporting performance as
@@ -131,16 +144,25 @@ regression, we can focus on the most important predictors.
 
 ## Generating the nodes
 
-```{r, echo=TRUE}
+So we can print the nodes, but how do we actually *use* them. To use the nodes
+we have to put them in a format that can be used for modeling. We will use the
+`predict` function to create a matrix where every column corresponds to a node
+and a value of "1" represents an observation passing through that node.
+
+```{r, echo=TRUE, collapse=TRUE}
 # predictions from lumberyard
 nodes <- predict(ly, df[dev,-1], type = 'All')
+
+# dimensions of the node matrix
 dim(nodes)
-head(nodes[1:5,1:5]) # sample of what matrix looks like
+
+# sample of what matrix looks like
+head(nodes[1:5,1:5]) 
 ```
 
-Becuase we specified a `maxnodes` of 8 when we created the `randomForest` we
+Becuase we specified a `maxnodes` of 8 when we created the `randomForest`, we
 created 14 nodes per tree. `maxnodes` specifies the number of *terminal* nodes.
-Every pair of nodes has one parent so the total nodes possible in a tree is with
+Every pair of nodes has one parent so the total nodes possible in a tree with
 a `maxnodes` value of 8 is:
 
 $$8 + 4 + 2 = 14$$
@@ -170,10 +192,12 @@ summary(cnts)
 
 Roughly a quarter of our nodes have fewer than 25 observations in the terminal
 node. This is a little too many for my comfort so I am going to zero out the 
-nodes by using a convenience function from `timbr`.
+nodes by using a convenience function from `timbr`. Additionaly, because of how
+the nodes are constructed, there is a small chance that duplicate nodes are 
+created. We can account for these using the same function.
 
 ```{r, echo=TRUE}
-nodes <- dropSmallNodes(nodes, 25)
+nodes <- massageNodes(nodes, 25, drop.dups = TRUE)
 cnts <- apply(nodes, 2, sum)
 summary(cnts[cnts > 0])
 ```
@@ -198,7 +222,8 @@ plot(fit)
 We just trained a LASSO regression model on our dataset five times. The plot
 shows our cross-validated error as a function of the number of predcitors in our
 model. Remember, we started with 1,400 predictors and the plot shows that only 
-using 27 produces the best cross-validated model!
+using `r sum(coef(fit, s='lambda.min') != 0)` produces the best cross-validated
+model!
 
 ```{r, echo=TRUE}
 # get a list of the best predictors
@@ -272,11 +297,11 @@ printNodes(ly, best)
 sink()
 ```
 
-## What about that baseline model
+## What about out logistic regression model?
 
 We can do more than just output new fields into Xeno, though. Let's see if any
-of our flags want to come into our logistic regression model. Let's add just the
-top two nodes to our dataset and see how the logistic model performs.
+of our flags want to come into our logistic regression model. Let's add the top
+nodes to our dataset and see how if they want to come into our logistic model.
 
 First we will add our best-performing nodes to the original titanic dataset.
 ```{r, echo=TRUE}
@@ -319,11 +344,11 @@ full <- step(base, f2, direction="forward")
 
 We now have two logistic regression models. One built using main effects only
 which simulates the Xeno modeling process and one consisting of the same model
-with the added possibility of using additional interaction nodes.
+with additional interaction nodes.
 
 We can compare the results of each model and plot their ROC curves.
 
-```{r, echo = TRUE}
+```{r, echo = TRUE, collapse=TRUE}
 # score the base model and the model w/Nodes on the VALIDATION data sets
 phat.original <- predict(base, titanic[-dev,])
 phat.wNodes <- predict(full, df2[-dev,])
@@ -343,5 +368,3 @@ library(pROC)
 plot(roc(titanic[-dev,1], phat.original))
 lines(roc(titanic[-dev,1], phat.wNodes), col='red')
 ```
-
-

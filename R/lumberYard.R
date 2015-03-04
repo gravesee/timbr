@@ -46,6 +46,7 @@ lumberYard <- function(object, ...) {
 #'  by the decistion tree model object used to create the lumberYard.
 #'  \item 'Nodes' - When passed \code{i}, returns binary membership for only 
 #'  those requested nodes.}
+#'  @export predict.lumberYard
 predict.lumberYard <- function(x, newdata, i=NULL, type='Terminal') {  
   if (is.null(i)) i <- 1:length(x)
   

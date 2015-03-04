@@ -1,7 +1,7 @@
 ---
 title: "Using timbr"
 author: "Eric E. Graves"
-date: "2015-03-03"
+date: "2015-03-04"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{usage}
@@ -79,13 +79,9 @@ We now have a fully working logistic regression model with two terms. Pretending
 for a moment that this model was built in `Xeno`, we would call our model
 finished. 
 
-But what about insights we might not think of? `timbr` provieds a fast, cheap
+But what about insights we might not think of? `timbr` provides a fast, cheap
 method for generating simple interaction rules that are predictive and may
 provide additional lift when added to a model.
-
-The concept of `timbr` is to wrap a decision tree object into a simple,
-easy-to-use object called a `lumberYard`. The `lumberYard` allows you to extract
-all sorts of useful tidbits from the underlying decision tree model.
 
 ## Generating rules using a Random Forest
 
@@ -129,9 +125,13 @@ variable must be a `factor`.
 
 ## Creating a lumberYard
 
+The concept of `timbr` is to wrap a decision tree model within a simple,
+easy-to-use object called a `lumberYard`. The `lumberYard` allows you to extract
+all sorts of useful tidbits from the underlying decision tree model.
+
 Creating a `lumberYard` from a `randomForest` object is easy, though it can take
 a while if your ensemble has a great many trees and nodes. Simply wrap your
-`gbm` or `randomForest` object in the `lumberYard` function.
+`randomForest` object in the `lumberYard` function.
 
 
 ```r
@@ -143,57 +143,43 @@ accessed for routine use. But in general, it is a massive collection of `nodes`
 that have been translated from the underlying tree models. We can inspect the 
 `nodes` with `printNodes` and a vector of node IDs.
 
+Below is a printout of the first node and its first child. Notice that the child
+node contains the text of the parent node. This is logically consistent with how
+decision trees are created.
+
 
 ```r
-printNodes(ly, 1) # first split left
-```
-
-```
-## NodeID:     1
-## ------------------
-## Embarked in c('','C')
-```
-
-```r
-printNodes(ly, 2) # first split right
-```
-
-```
+# first split
+printNodes(ly, 1)
 ## NodeID:     2
-## ------------------
-## Embarked in c('Q','S')
-```
+## --------------------
+## Embarked in c('','C')
 
-```r
-printNodes(ly, 3) # child of first split
-```
-
-```
-## NodeID:     3
-## ------------------
+# child of first split
+printNodes(ly, 3)
+## NodeID:     4
+## --------------------
 ## Embarked in c('','C')
 ## Fare <= 30.1
 ```
 
-```r
-printNodes(ly, c(1, 5, 10)) # multiple nodes
-```
+We can also pass a vector of node IDs to `printNodes` and it will print out each
+one in sequence.
 
-```
-## NodeID:     1
-## ------------------
-## Embarked in c('','C') 
-## 
+
+```r
+# multiple nodes
+printNodes(ly, c(4, 7))
 ## NodeID:     5
-## ------------------
-## Embarked in c('Q','S')
-## SibSp <= 1.5 
-## 
-## NodeID:    10
-## ------------------
+## --------------------
 ## Embarked in c('','C')
-## Fare > 30.1
-## Pclass in c('2','3')
+## Fare > 30.1 
+## 
+## NodeID:     8
+## --------------------
+## Embarked in c('','C')
+## Fare <= 30.1
+## SibSp <= 1.5
 ```
 
 `printNodes` takes some optional data arguments for reporting performance as
@@ -206,22 +192,22 @@ regression, we can focus on the most important predictors.
 
 ## Generating the nodes
 
+So we can print the nodes, but how do we actually *use* them. To use the nodes
+we have to put them in a format that can be used for modeling. We will use the
+`predict` function to create a matrix where every column corresponds to a node
+and a value of "1" represents an observation passing through that node.
+
 
 ```r
 # predictions from lumberyard
 nodes <- predict(ly, df[dev,-1], type = 'All')
+
+# dimensions of the node matrix
 dim(nodes)
-```
-
-```
 ## [1]  445 1400
-```
 
-```r
-head(nodes[1:5,1:5]) # sample of what matrix looks like
-```
-
-```
+# sample of what matrix looks like
+head(nodes[1:5,1:5]) 
 ##      [,1] [,2] [,3] [,4] [,5]
 ## [1,]    1    0    0    1    0
 ## [2,]    0    1    0    0    1
@@ -230,9 +216,9 @@ head(nodes[1:5,1:5]) # sample of what matrix looks like
 ## [5,]    0    1    0    0    1
 ```
 
-Becuase we specified a `maxnodes` of 8 when we created the `randomForest` we
+Becuase we specified a `maxnodes` of 8 when we created the `randomForest`, we
 created 14 nodes per tree. `maxnodes` specifies the number of *terminal* nodes.
-Every pair of nodes has one parent so the total nodes possible in a tree is with
+Every pair of nodes has one parent so the total nodes possible in a tree with
 a `maxnodes` value of 8 is:
 
 $$8 + 4 + 2 = 14$$
@@ -268,18 +254,20 @@ summary(cnts)
 
 Roughly a quarter of our nodes have fewer than 25 observations in the terminal
 node. This is a little too many for my comfort so I am going to zero out the 
-nodes by using a convenience function from `timbr`.
+nodes by using a convenience function from `timbr`. Additionaly, because of how
+the nodes are constructed, there is a small chance that duplicate nodes are 
+created. We can account for these using the same function.
 
 
 ```r
-nodes <- dropSmallNodes(nodes, 25)
+nodes <- massageNodes(nodes, 25, drop.dups = TRUE)
 cnts <- apply(nodes, 2, sum)
 summary(cnts[cnts > 0])
 ```
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##    25.0    48.0    88.0   126.9   190.0   420.0
+##    25.0    44.0    74.0   109.7   160.0   420.0
 ```
 
 We now have a nodes matrix where nodes are either ALL zero, or have a minimum
@@ -300,12 +288,13 @@ fit <- cv.glmnet(x = nodes, y = df$Survived[dev], alpha = 1,
 plot(fit)
 ```
 
-![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png) 
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
 
 We just trained a LASSO regression model on our dataset five times. The plot
 shows our cross-validated error as a function of the number of predcitors in our
 model. Remember, we started with 1,400 predictors and the plot shows that only 
-using 27 produces the best cross-validated model!
+using 24 produces the best cross-validated
+model!
 
 
 ```r
@@ -316,8 +305,8 @@ best
 ```
 
 ```
-##  [1]    6   53  174  188  315  343  355  363  389  401  420  511  537  571
-## [15]  667  820  869  870  915 1043 1045 1048 1089 1189 1384
+##  [1]    6   53  174  315  343  355  363  389  401  420  511  537  571  820
+## [15]  869  870  915 1043 1045 1048 1089 1189 1384
 ```
 
 ```r
@@ -341,15 +330,15 @@ printNodes(ly, best[c(1,3)])
 ```
 
 ```
-## NodeID:  1384
-## ------------------
+## NodeID:    13
+## --------------------
 ## SibSp <= 2.5
 ## Parch <= 0.5
 ## Fare > 52.2771
 ## Pclass in c('1','3') 
 ## 
-## NodeID:  1189
-## ------------------
+## NodeID:    14
+## --------------------
 ## Sex in c('female')
 ## Embarked in c('','C','Q')
 ## Parch <= 1.5
@@ -366,8 +355,8 @@ printNodes(ly, best[16], df[dev,-1], df$Survived[dev])
 ```
 
 ```
-## NodeID:    53
-## ------------------
+## NodeID:    12
+## --------------------
 ## Sex in c('male')
 ## Age > 1.5
 ## Fare <= 52.2771 
@@ -388,8 +377,8 @@ printNodes(ly, best[2], df[dev,-1], df$Survived[dev])
 ```
 
 ```
-## NodeID:   389
-## ------------------
+## NodeID:    12
+## --------------------
 ## Sex in c('female')
 ## SibSp <= 5
 ## Pclass in c('1','2')
@@ -437,11 +426,11 @@ printNodes(ly, best)
 sink()
 ```
 
-## What about that baseline model
+## What about out logistic regression model?
 
 We can do more than just output new fields into Xeno, though. Let's see if any
-of our flags want to come into our logistic regression model. Let's add just the
-top two nodes to our dataset and see how the logistic model performs.
+of our flags want to come into our logistic regression model. Let's add the top
+nodes to our dataset and see how if they want to come into our logistic model.
 
 First we will add our best-performing nodes to the original titanic dataset.
 
@@ -487,7 +476,7 @@ full <- step(base, f2, direction="forward")
 
 We now have two logistic regression models. One built using main effects only
 which simulates the Xeno modeling process and one consisting of the same model
-with the added possibility of using additional interaction nodes.
+with additional interaction nodes.
 
 We can compare the results of each model and plot their ROC curves.
 
@@ -499,24 +488,14 @@ phat.wNodes <- predict(full, df2[-dev,])
 
 # ks of original
 ks.table(phat.original, titanic$Survived[-dev])$ks
-```
-
-```
 ## [1] 0.5553872
-```
 
-```r
 # ks with Nodes
 ks.table(phat.wNodes, titanic$Survived[-dev])$ks
-```
-
-```
 ## [1] 0.6594276
 ```
 
 Plotting the ROC curves we see the interaction nodes did indeed add 
 considerable lift to the model (red curve).
 
-![plot of chunk unnamed-chunk-22](figure/unnamed-chunk-22-1.png) 
-
-
+![plot of chunk unnamed-chunk-23](figure/unnamed-chunk-23-1.png) 
