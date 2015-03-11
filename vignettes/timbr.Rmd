@@ -241,10 +241,8 @@ that we only modeled with nodes indexed by our `keep` vector. So to retrieve the
 original node position we must index `keep` with `best`
 
 ```{r, echo=TRUE}
-head(keep[best])
-
-# sort by absolute value of the coefficient ** not necessary **
-best <- best[order(-abs(betas[best]))]
+top <- keep[best]
+head(top)
 ```
 
 To find out which nodes are the most predictive, we need to work with the `coef`
@@ -258,23 +256,23 @@ like.
 
 ```{r, echo=TRUE}
 # print just the node text for nodes 1 and 3
-printNodes(ly, best[c(1,3)])
+printNodes(ly, top[c(1, 4)])
 ```
 
 By passing a dataset and response variable into the `printNodes` function we can
 also generate performance statistics for the node.
 
 ```{r, echo=TRUE}
-# let's see how the sixteenth node performs
-printNodes(ly, best[24], df[dev,-1], df$Survived[dev])
+# let's see how the 1045th node performs
+printNodes(ly, top[22], df[dev,-1], df$Survived[dev])
 ```
 
 Based on the results for this node, if you were potty-trained male with a cheap
 ticket, you didn't fare too well during the sinking of the Titanic.
 
 ```{r, echo=TRUE}
-# And by contrast, the second node
-printNodes(ly, best[3], df[dev,-1], df$Survived[dev])
+# And by contrast, the 389th node
+printNodes(ly, top[7], df[dev,-1], df$Survived[dev])
 ```
 
 Young or married females in first and second class with family members aboard
@@ -310,7 +308,7 @@ printNodes(ly, best)
 sink()
 ```
 
-## What about out logistic regression model?
+## Adding nodes to a logistic regression model
 
 We can do more than just output new fields into Xeno, though. Let's see if any
 of our flags want to come into our logistic regression model. Let's add the top

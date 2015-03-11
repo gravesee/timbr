@@ -10,8 +10,8 @@ duplicateNodes(ly)
 \item{x}{a \code{\link{lumberYard}}}
 }
 \value{
-a vector of node indices that are duplicates. The first duplicate is
-preserved and not included in the index vector.
+a vector of boolean values the same length as the number of nodes in
+the \code{lumberYard}.
 }
 \description{
 Returns the index positions of nodes with identical node-text. Much faster

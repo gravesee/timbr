@@ -309,16 +309,12 @@ original node position we must index `keep` with `best`
 
 
 ```r
-head(keep[best])
+top <- keep[best]
+head(top)
 ```
 
 ```
 ## [1]  53 174 235 264 343 363
-```
-
-```r
-# sort by absolute value of the coefficient ** not necessary **
-best <- best[order(-abs(betas[best]))]
 ```
 
 To find out which nodes are the most predictive, we need to work with the `coef`
@@ -333,29 +329,7 @@ like.
 
 ```r
 # print just the node text for nodes 1 and 3
-printNodes(ly, best[c(1,3)])
-```
-
-```
-## NodeID:   858
-## ------------------
-## Pclass in c('1')
-## Fare > 29.85 
-## 
-## NodeID:   385
-## ------------------
-## Sex in c('female')
-## SibSp <= 5
-## Pclass in c('1','2')
-```
-
-By passing a dataset and response variable into the `printNodes` function we can
-also generate performance statistics for the node.
-
-
-```r
-# let's see how the sixteenth node performs
-printNodes(ly, best[24], df[dev,-1], df$Survived[dev])
+printNodes(ly, top[c(1, 4)])
 ```
 
 ```
@@ -365,10 +339,33 @@ printNodes(ly, best[24], df[dev,-1], df$Survived[dev])
 ## Age > 1.5
 ## Fare <= 52.2771 
 ## 
+## NodeID:   264
+## ------------------
+## Sex in c('male')
+## Age > 0.915
+## Age > 77
+```
+
+By passing a dataset and response variable into the `printNodes` function we can
+also generate performance statistics for the node.
+
+
+```r
+# let's see how the 1045th node performs
+printNodes(ly, top[22], df[dev,-1], df$Survived[dev])
+```
+
+```
+## NodeID:  1045
+## ------------------
+## Sex in c('male')
+## Age > 1.5
+## Fare <= 114.45 
+## 
 ## Performance:
 ##    node y.totN y.sumY y.meanY
-## 1 FALSE    183    130    0.71
-## 2  TRUE    262     36   0.137
+## 1 FALSE    156    119   0.763
+## 2  TRUE    289     47   0.163
 ```
 
 Based on the results for this node, if you were potty-trained male with a cheap
@@ -376,21 +373,22 @@ ticket, you didn't fare too well during the sinking of the Titanic.
 
 
 ```r
-# And by contrast, the second node
-printNodes(ly, best[3], df[dev,-1], df$Survived[dev])
+# And by contrast, the 389th node
+printNodes(ly, top[7], df[dev,-1], df$Survived[dev])
 ```
 
 ```
-## NodeID:   385
+## NodeID:   389
 ## ------------------
 ## Sex in c('female')
 ## SibSp <= 5
-## Pclass in c('1','2') 
+## Pclass in c('1','2')
+## Age <= 56.5 
 ## 
 ## Performance:
 ##    node y.totN y.sumY y.meanY
-## 1 FALSE    362     87    0.24
-## 2  TRUE     83     79   0.952
+## 1 FALSE    365     89   0.244
+## 2  TRUE     80     77   0.963
 ```
 
 Young or married females in first and second class with family members aboard
@@ -429,7 +427,7 @@ printNodes(ly, best)
 sink()
 ```
 
-## What about out logistic regression model?
+## Adding nodes to a logistic regression model
 
 We can do more than just output new fields into Xeno, though. Let's see if any
 of our flags want to come into our logistic regression model. Let's add the top
