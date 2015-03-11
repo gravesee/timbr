@@ -19,7 +19,7 @@ lumberYard <- function(object, ...) {
     x <- harvest(timbr(object, n, species))
     idx[[n]] <- cbind(n, seq_along(x))
     lumberList[[n]] <- x    
-  }  
+  }
   
   structure(
     lumberList,

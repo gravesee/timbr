@@ -60,35 +60,17 @@ imputeMissing <- function(x) {
   structure(df, imputed = impute.values, class = c('data.frame', 'imputed'))
 }
 
-#(TODO) calculate deviance for uncorrelated scoring...
-
-#' Massage nodes matrix
+#' Get duplicate nodes from LumberYard object
 #' 
-#' Post process a matrix of nodes to eliminate those with insufficient counts
-#' as well as duplicate nodes. If either the zeroes or ones of a column have
-#' fewer than \code{size} observations, those columns will be zeroed out. If
-#' \code{drop.dups} is set to \code{TRUE} then duplicate columns will also be 
-#' zeroed out.
+#' Returns the index positions of nodes with identical node-text. Much faster
+#' and memory efficient than running \code{which(duplicated(t(nodes))}.
 #' 
-#' @param x A matrix of binary node indicators.
-#' @param size the minimum observations for any node.
-#' @param drop.dups a boolean value for whether duplicate columns should be 
-#' zeroed out from the matrix.
-#' @param sparse a boolean value for whether the returned matrix should be
-#' sparse. Sparse matrices save memory.
-#' @return a matrix the same dimension as the input matrix \code{x} or a
-#' sparse Matrix if \code{sparse} is \code{TRUE}.
+#' @param x a \code{\link{lumberYard}}
+#' @return a vector of boolean values the same length as the number of nodes in
+#' the \code{lumberYard}.
 #' 
-#' @export massageNodes
-massageNodes <- function(x, size = 50, drop.dups = TRUE, sparse = FALSE) {
-  nd.cnt <- apply(x, 2, sum)
-  f <- nd.cnt < size | nd.cnt > (nrow(x) - size)
-  x[,f] <- 0
-  
-  if (drop.dups) {
-    x[,duplicated(t(x))] <- 0
-  }
-  
-  if (sparse) return(Matrix(x)) else x
-  
+#' @export duplicateNodes
+duplicateNodes <- function(ly) {
+  nodeText <- lapply(ly, function(x) lapply(x, '[[', 'nodeText'))
+  duplicated(unlist(nodeText))
 }

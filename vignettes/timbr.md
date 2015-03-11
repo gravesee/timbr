@@ -1,7 +1,7 @@
 ---
 title: "Using timbr"
 author: "Eric E. Graves"
-date: "2015-03-04"
+date: "2015-03-11"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{usage}
@@ -151,14 +151,14 @@ decision trees are created.
 ```r
 # first split
 printNodes(ly, 1)
-## NodeID:     2
-## --------------------
+## NodeID:     1
+## ------------------
 ## Embarked in c('','C')
 
 # child of first split
 printNodes(ly, 3)
-## NodeID:     4
-## --------------------
+## NodeID:     3
+## ------------------
 ## Embarked in c('','C')
 ## Fare <= 30.1
 ```
@@ -170,13 +170,13 @@ one in sequence.
 ```r
 # multiple nodes
 printNodes(ly, c(4, 7))
-## NodeID:     5
-## --------------------
+## NodeID:     4
+## ------------------
 ## Embarked in c('','C')
 ## Fare > 30.1 
 ## 
-## NodeID:     8
-## --------------------
+## NodeID:     7
+## ------------------
 ## Embarked in c('','C')
 ## Fare <= 30.1
 ## SibSp <= 1.5
@@ -253,37 +253,36 @@ summary(cnts)
 ```
 
 Roughly a quarter of our nodes have fewer than 25 observations in the terminal
-node. This is a little too many for my comfort so I am going to zero out the 
-nodes by using a convenience function from `timbr`. Additionaly, because of how
+node. This is a little too many for my comfort. Additionaly, because of how
 the nodes are constructed, there is a small chance that duplicate nodes are 
-created. We can account for these using the same function.
+created. We need to keep track of these kinds of nodes so we don't model with
+them in later steps.
 
 
 ```r
-nodes <- massageNodes(nodes, 25, drop.dups = TRUE)
-cnts <- apply(nodes, 2, sum)
-summary(cnts[cnts > 0])
+# calling duplicateNodes on a lumberYard object returns the indices of the dups
+dups <- duplicateNodes(ly)
+
+# combined with the node counts vector created above, we can create a vector of
+# indices that meet our minimum requirements for modeling
+keep <- which(cnts >= 25 | !dups)
 ```
 
-```
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##    25.0    44.0    74.0   109.7   160.0   420.0
-```
-
-We now have a nodes matrix where nodes are either ALL zero, or have a minimum
-of 25 observations. We are ready to find out which ones are the most predictive.
+We now hove a vector of index positions indicating ONLY those nodes that have at
+least 25 observations and are not duplicated.
 
 ## Finding predictive rules
 
 Creating a LASSO regression is easy with our nodes matrix and a target variable.
 We just need to remember to load the library and pass in the appropriate 
-arguments to the function.
+arguments to the function. Notice I am using the `keep` vector we created in 
+the previous step.
 
 
 ```r
 library(glmnet)
 
-fit <- cv.glmnet(x = nodes, y = df$Survived[dev], alpha = 1,
+fit <- cv.glmnet(x = nodes[, keep], y = df$Survived[dev], alpha = 1,
                  family = 'binomial', nfolds = 5)
 plot(fit)
 ```
@@ -293,7 +292,7 @@ plot(fit)
 We just trained a LASSO regression model on our dataset five times. The plot
 shows our cross-validated error as a function of the number of predcitors in our
 model. Remember, we started with 1,400 predictors and the plot shows that only 
-using 24 produces the best cross-validated
+using 32 produces the best cross-validated
 model!
 
 
@@ -301,12 +300,20 @@ model!
 # get a list of the best predictors
 betas <- coef(fit, s = 'lambda.min')[-1]
 best <- which(betas != 0) # gives us the nodes that aren't zeroed out!
-best
+```
+
+It is important to remember that the `best` vector created above contains the 
+index positions of the nodes that we used in the LASSO regression step. Remember
+that we only modeled with nodes indexed by our `keep` vector. So to retrieve the
+original node position we must index `keep` with `best`
+
+
+```r
+head(keep[best])
 ```
 
 ```
-##  [1]    6   53  174  315  343  355  363  389  401  420  511  537  571  820
-## [15]  869  870  915 1043 1045 1048 1089 1189 1384
+## [1]  53 174 235 264 343 363
 ```
 
 ```r
@@ -330,19 +337,16 @@ printNodes(ly, best[c(1,3)])
 ```
 
 ```
-## NodeID:    13
-## --------------------
-## SibSp <= 2.5
-## Parch <= 0.5
-## Fare > 52.2771
-## Pclass in c('1','3') 
+## NodeID:   858
+## ------------------
+## Pclass in c('1')
+## Fare > 29.85 
 ## 
-## NodeID:    14
-## --------------------
+## NodeID:   385
+## ------------------
 ## Sex in c('female')
-## Embarked in c('','C','Q')
-## Parch <= 1.5
-## Age <= 29
+## SibSp <= 5
+## Pclass in c('1','2')
 ```
 
 By passing a dataset and response variable into the `printNodes` function we can
@@ -351,12 +355,12 @@ also generate performance statistics for the node.
 
 ```r
 # let's see how the sixteenth node performs
-printNodes(ly, best[16], df[dev,-1], df$Survived[dev])
+printNodes(ly, best[24], df[dev,-1], df$Survived[dev])
 ```
 
 ```
-## NodeID:    12
-## --------------------
+## NodeID:    53
+## ------------------
 ## Sex in c('male')
 ## Age > 1.5
 ## Fare <= 52.2771 
@@ -373,21 +377,20 @@ ticket, you didn't fare too well during the sinking of the Titanic.
 
 ```r
 # And by contrast, the second node
-printNodes(ly, best[2], df[dev,-1], df$Survived[dev])
+printNodes(ly, best[3], df[dev,-1], df$Survived[dev])
 ```
 
 ```
-## NodeID:    12
-## --------------------
+## NodeID:   385
+## ------------------
 ## Sex in c('female')
 ## SibSp <= 5
-## Pclass in c('1','2')
-## Age <= 56.5 
+## Pclass in c('1','2') 
 ## 
 ## Performance:
 ##    node y.totN y.sumY y.meanY
-## 1 FALSE    365     89   0.244
-## 2  TRUE     80     77   0.963
+## 1 FALSE    362     87    0.24
+## 2  TRUE     83     79   0.952
 ```
 
 Young or married females in first and second class with family members aboard
@@ -492,10 +495,10 @@ ks.table(phat.original, titanic$Survived[-dev])$ks
 
 # ks with Nodes
 ks.table(phat.wNodes, titanic$Survived[-dev])$ks
-## [1] 0.6594276
+## [1] 0.5949495
 ```
 
 Plotting the ROC curves we see the interaction nodes did indeed add 
 considerable lift to the model (red curve).
 
-![plot of chunk unnamed-chunk-23](figure/unnamed-chunk-23-1.png) 
+![plot of chunk unnamed-chunk-24](figure/unnamed-chunk-24-1.png) 

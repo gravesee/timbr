@@ -191,30 +191,34 @@ summary(cnts)
 ```
 
 Roughly a quarter of our nodes have fewer than 25 observations in the terminal
-node. This is a little too many for my comfort so I am going to zero out the 
-nodes by using a convenience function from `timbr`. Additionaly, because of how
+node. This is a little too many for my comfort. Additionaly, because of how
 the nodes are constructed, there is a small chance that duplicate nodes are 
-created. We can account for these using the same function.
+created. We need to keep track of these kinds of nodes so we don't model with
+them in later steps.
 
 ```{r, echo=TRUE}
-nodes <- massageNodes(nodes, 25, drop.dups = TRUE)
-cnts <- apply(nodes, 2, sum)
-summary(cnts[cnts > 0])
+# calling duplicateNodes on a lumberYard object returns the indices of the dups
+dups <- duplicateNodes(ly)
+
+# combined with the node counts vector created above, we can create a vector of
+# indices that meet our minimum requirements for modeling
+keep <- which(cnts >= 25 | !dups)
 ```
 
-We now have a nodes matrix where nodes are either ALL zero, or have a minimum
-of 25 observations. We are ready to find out which ones are the most predictive.
+We now hove a vector of index positions indicating ONLY those nodes that have at
+least 25 observations and are not duplicated.
 
 ## Finding predictive rules
 
 Creating a LASSO regression is easy with our nodes matrix and a target variable.
 We just need to remember to load the library and pass in the appropriate 
-arguments to the function.
+arguments to the function. Notice I am using the `keep` vector we created in 
+the previous step.
 
 ```{r, echo=TRUE}
 library(glmnet)
 
-fit <- cv.glmnet(x = nodes, y = df$Survived[dev], alpha = 1,
+fit <- cv.glmnet(x = nodes[, keep], y = df$Survived[dev], alpha = 1,
                  family = 'binomial', nfolds = 5)
 plot(fit)
 ```
@@ -229,7 +233,16 @@ model!
 # get a list of the best predictors
 betas <- coef(fit, s = 'lambda.min')[-1]
 best <- which(betas != 0) # gives us the nodes that aren't zeroed out!
-best
+```
+
+It is important to remember that the `best` vector created above contains the 
+index positions of the nodes that we used in the LASSO regression step. Remember
+that we only modeled with nodes indexed by our `keep` vector. So to retrieve the
+original node position we must index `keep` with `best`
+
+```{r, echo=TRUE}
+head(keep[best])
+
 # sort by absolute value of the coefficient ** not necessary **
 best <- best[order(-abs(betas[best]))]
 ```
@@ -253,7 +266,7 @@ also generate performance statistics for the node.
 
 ```{r, echo=TRUE}
 # let's see how the sixteenth node performs
-printNodes(ly, best[16], df[dev,-1], df$Survived[dev])
+printNodes(ly, best[24], df[dev,-1], df$Survived[dev])
 ```
 
 Based on the results for this node, if you were potty-trained male with a cheap
@@ -261,7 +274,7 @@ ticket, you didn't fare too well during the sinking of the Titanic.
 
 ```{r, echo=TRUE}
 # And by contrast, the second node
-printNodes(ly, best[2], df[dev,-1], df$Survived[dev])
+printNodes(ly, best[3], df[dev,-1], df$Survived[dev])
 ```
 
 Young or married females in first and second class with family members aboard
